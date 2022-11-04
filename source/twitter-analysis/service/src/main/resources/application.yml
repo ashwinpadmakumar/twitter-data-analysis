@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: twitter-data-analysis
+  profiles:
+    active: local

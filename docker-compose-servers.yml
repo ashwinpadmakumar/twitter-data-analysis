@@ -1,0 +1,80 @@
+version: "3.8"
+networks:
+  personal-network:
+    external: true
+services:
+  zookeeper-service:
+    image: bitnami/zookeeper
+    tmpfs: "/bitnami/datalog"
+    ports:
+      - 2181:2181
+    volumes:
+      - zookeeper_service_data:/bitnami/zookeeper
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    networks:
+      - personal-network
+    hostname: zookeeper-service
+    container_name: zookeeper-service
+
+  kafka-service:
+    image: bitnami/kafka
+    ports:
+      - 9092:9092
+      - 7071:7071
+      - 9093:9093
+    volumes:
+      - kafka_service_data:/bitnami/kafka
+    environment:
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper-service:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka-service:9092,EXTERNAL://localhost:9093
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=CLIENT
+      - KAFKA_HEAP_OPTS=-Xms512M -Xmx1024M
+    networks:
+      - personal-network
+    hostname: kafka-service
+    container_name: kafka-service
+    depends_on:
+      - zookeeper-service
+
+  elasticsearch-service:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.15.2
+    environment:
+      - cluster.name=elasticsearch
+      - bootstrap.memory_lock=true
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512M -Xmx1024M
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - 9200:9200
+    volumes:
+      - elasticsearch_service_data:/usr/share/elasticsearch/data
+    networks:
+      - personal-network
+    hostname: elasticsearch-service
+    container_name: elasticsearch-service
+  
+  kibana-service:
+    image: docker.elastic.co/kibana/kibana:7.15.2
+    depends_on:
+      - elasticsearch-service
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch-service:9200
+    ports:
+      - 5601:5601
+    networks:
+      - personal-network
+    hostname: kibana-service
+    container_name: kibana-service
+
+volumes:
+  zookeeper_service_data:
+  kafka_service_data:
+  elasticsearch_service_data:
+  elasticsearch_service_config:

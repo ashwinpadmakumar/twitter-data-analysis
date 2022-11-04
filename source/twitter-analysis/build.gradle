@@ -1,0 +1,28 @@
+plugins {
+    id 'java'
+    id 'checkstyle'
+}
+
+allprojects {
+    group = 'com.workspace'
+    version = '0.0.1-SNAPSHOT'
+    sourceCompatibility = '11'
+
+    apply plugin: 'checkstyle'
+
+    checkstyle {
+        toolVersion '8.39'
+        configFile rootProject.file('config/checkstyle/checkstyle.xml')
+        ignoreFailures = false
+        maxWarnings = 0
+        maxErrors = 0
+    }
+
+    test {
+        useJUnitPlatform()
+    }
+
+    repositories {
+        mavenCentral()
+    }
+}

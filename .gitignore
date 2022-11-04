@@ -1,0 +1,6 @@
+.idea/
+build/
+source/twitter-analysis/.gradle/
+source/twitter-analysis/build/
+source/twitter-analysis/service/logs
+.env

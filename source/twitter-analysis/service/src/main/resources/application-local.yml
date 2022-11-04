@@ -1,0 +1,15 @@
+spring:
+  twitter:
+    consumerKey: <-- twitter consumer key -->
+    consumerSecret: <-- twitter consumer secret -->
+    token: <-- twitter token -->
+    tokenSecret: <-- twitter token secret -->
+    terms: bitcoin
+  kafka:
+    bootstrapServer: localhost:9092
+    topic: twitter-tweets
+  elasticsearch:
+    hostname: localhost
+    port: 9200
+    scheme: http
+    index: twitter_tweets
